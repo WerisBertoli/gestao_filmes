@@ -20,8 +20,12 @@ import { MovieApiService, OmdbSearchItem } from '../../core/movie-api.service';
       </div>
       <div class="search-card card">
         <div class="search-row">
-          <dx-text-box [(value)]="title" placeholder="Digite o título do filme..." stylingMode="outlined" width="100%" (onEnterKey)="search()" />
-          <dx-button text="Buscar" type="default" stylingMode="contained" [disabled]="loading" (onClick)="search()" />
+          <div class="search-field">
+            <dx-text-box [(value)]="title" placeholder="Digite o título do filme..." stylingMode="outlined" width="100%" (onEnterKey)="search()" />
+          </div>
+          <div class="search-btn-wrap">
+            <dx-button text="Buscar" type="default" stylingMode="contained" [disabled]="loading" [width]="124" [height]="38" (onClick)="search()" />
+          </div>
         </div>
         @if (message) { <p class="search-msg" [class.msg-ok]="msgOk" [class.msg-err]="!msgOk">{{ message }}</p> }
       </div>
@@ -80,7 +84,12 @@ import { MovieApiService, OmdbSearchItem } from '../../core/movie-api.service';
     .subtitle { font-size: 0.875rem; color: #6B7A99; margin: 0; }
     .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(29,57,140,0.08); }
     .search-card { padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; }
-    .search-row { display: flex; gap: 0.75rem; align-items: center; }
+    .search-row { display: flex; gap: 0.85rem; align-items: stretch; }
+    .search-field { flex: 1; min-width: 0; }
+    .search-field ::ng-deep .dx-texteditor { width: 100% !important; max-width: 100%; }
+    .search-btn-wrap { flex-shrink: 0; display: flex; align-items: center; align-self: center; }
+    .search-btn-wrap ::ng-deep .dx-button { min-width: 7.75rem; }
+    .search-btn-wrap ::ng-deep .dx-button-content { padding-left: 1.1rem; padding-right: 1.1rem; }
     .search-msg { margin: 0.75rem 0 0; font-size: 0.85rem; color: #6B7A99; padding: 0.5rem 0.75rem; border-radius: 8px; background: #F4F7FC; }
     .msg-ok { color: #1E9E5E; background: #EDFBF4; }
     .msg-err { color: #D63939; background: #FEF1F1; }

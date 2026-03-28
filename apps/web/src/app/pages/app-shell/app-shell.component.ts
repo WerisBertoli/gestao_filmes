@@ -1,35 +1,62 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
+import { filter, map, merge, of } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 
 /**
- * Layout exclusivo usuário COMUM — sem itens de menu administrativo.
+ * Layout único: o menu segue a URL (`/app/admin/...` vs fluxo comum), sem trocar de
+ * componente lazy — evita flash de links COMUM ao atualizar em páginas admin.
  */
 @Component({
-  selector: 'app-shell-comum',
+  selector: 'app-shell',
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <header class="header">
       <div class="header-inner">
-        <a routerLink="/app/busca" class="brand">
-          <div class="brand-logo">MK</div>
-          <div class="brand-text">
-            <span class="brand-name">Microkids</span>
-            <span class="brand-sub">Gestão de Filmes</span>
-          </div>
-        </a>
-        <nav class="nav" aria-label="Área do usuário">
-          <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
-          <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
-          <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
-        </nav>
+        @if (adminSection()) {
+          <a routerLink="/app/admin/rankings" class="brand">
+            <div class="brand-logo">MK</div>
+            <div class="brand-text">
+              <span class="brand-name">Microkids</span>
+              <span class="brand-sub">Administração</span>
+            </div>
+          </a>
+          <nav class="nav" aria-label="Área administrativa">
+            <a routerLink="/app/admin/rankings" routerLinkActive="active">Rankings</a>
+            <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuários</a>
+          </nav>
+        } @else {
+          <a routerLink="/app/busca" class="brand">
+            <div class="brand-logo">MK</div>
+            <div class="brand-text">
+              <span class="brand-name">Microkids</span>
+              <span class="brand-sub">Gestão de Filmes</span>
+            </div>
+          </a>
+          <nav class="nav" aria-label="Área do usuário">
+            <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
+            <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
+            <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
+          </nav>
+        }
         <div class="spacer"></div>
         <div class="user-area">
           <div class="user-pill">
             <div class="user-avatar">{{ (auth.getPayload()?.email ?? 'U')[0].toUpperCase() }}</div>
             <span class="user-email">{{ auth.getPayload()?.email }}</span>
-            <span class="role-badge comum">Comum</span>
+            @if (auth.isAdmin()) {
+              <span class="role-badge admin">Admin</span>
+            } @else {
+              <span class="role-badge comum">Comum</span>
+            }
           </div>
           <button type="button" class="btn-logout" (click)="auth.logout()">Sair</button>
         </div>
@@ -161,6 +188,10 @@ import { AuthService } from '../../core/auth.service';
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
+      .role-badge.admin {
+        background: rgba(210, 224, 3, 0.25);
+        color: #d2e003;
+      }
       .role-badge.comum {
         background: rgba(101, 236, 236, 0.2);
         color: #65ecec;
@@ -189,6 +220,23 @@ import { AuthService } from '../../core/auth.service';
     `,
   ],
 })
-export class ShellComumComponent {
+export class AppShellComponent {
   readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
+  /** Menu admin vs comum deriva só da URL — estável no primeiro frame após refresh. */
+  readonly adminSection = toSignal(
+    merge(
+      of(this.isAdminSectionUrl(this.router.url)),
+      this.router.events.pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        map(() => this.isAdminSectionUrl(this.router.url)),
+      ),
+    ),
+    { initialValue: this.isAdminSectionUrl(this.router.url) },
+  );
+
+  private isAdminSectionUrl(url: string): boolean {
+    return url.includes('/app/admin');
+  }
 }
