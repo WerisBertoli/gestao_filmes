@@ -17,11 +17,12 @@ import { AuthService } from '../../core/auth.service';
           </div>
         </a>
         <nav class="nav">
-          <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
-          <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
-          <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
+          @if (!auth.isAdmin()) {
+            <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
+            <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
+            <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
+          }
           @if (auth.isAdmin()) {
-            <span class="nav-sep"></span>
             <a routerLink="/app/admin/rankings" routerLinkActive="active">Rankings</a>
             <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuários</a>
           }

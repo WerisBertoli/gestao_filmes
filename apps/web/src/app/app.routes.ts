@@ -1,6 +1,8 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/admin.guard';
 import { authGuard } from './core/auth.guard';
+import { AuthService } from './core/auth.service';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -22,7 +24,7 @@ export const routes: Routes = [
       import('./pages/shell/shell.component').then((m) => m.ShellComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'busca' },
+      { path: '', pathMatch: 'full', redirectTo: () => inject(AuthService).isAdmin() ? 'admin/rankings' : 'busca' },
       {
         path: 'busca',
         loadComponent: () =>

@@ -73,4 +73,8 @@ export class AuthService {
   isAdmin(): boolean {
     return this.getPayload()?.role === 'ADMIN';
   }
+
+  postLoginPath(): string {
+    return this.isAdmin() ? '/app/admin/rankings' : '/app/busca';
+  }
 }
