@@ -28,10 +28,12 @@ Monorepo **pnpm** com **Angular 19** (frontend), **NestJS 11** (API), **PostgreS
    pnpm db:seed
    ```
 
-   O seed cria o administrador de teste:
+   O seed cria o **administrador de teste** (sem esse passo o login admin falha):
 
    - **E-mail:** `admin@microkids.test`
    - **Senha:** `admin123`
+
+   O login ignora maiúsculas/minúsculas no e-mail. Na interface, **ADMIN** só acessa **Rankings** e **Usuários**; busca, favoritos e assistidos ficam só para **COMUM** (e a API bloqueia essas rotas para não-admin).
 
 ## Como rodar
 
@@ -73,11 +75,11 @@ Todas as rotas abaixo do prefixo **`/api`**.
 | ------ | ---- | ------------ | --------- |
 | POST | `/auth/register` | — | Cadastro (sempre **COMUM**) |
 | POST | `/auth/login` | — | Login, retorna JWT |
-| GET | `/movies/search?title=` | JWT | Busca na OMDb (via backend) |
-| POST | `/favorites` | JWT | Body `{ "imdbId": "tt..." }` — favoritar |
-| GET | `/favorites` | JWT | Lista favoritos do usuário |
-| POST | `/watched` | JWT | Body `{ "imdbId": "tt..." }` — assistido |
-| GET | `/watched` | JWT | Lista assistidos do usuário |
+| GET | `/movies/search?title=` | JWT **COMUM** | Busca na OMDb (via backend) |
+| POST | `/favorites` | JWT **COMUM** | Body `{ "imdbId": "tt..." }` — favoritar |
+| GET | `/favorites` | JWT **COMUM** | Lista favoritos do usuário |
+| POST | `/watched` | JWT **COMUM** | Body `{ "imdbId": "tt..." }` — assistido |
+| GET | `/watched` | JWT **COMUM** | Lista assistidos do usuário |
 | GET | `/admin/users` | JWT **ADMIN** | Lista usuários |
 | GET | `/admin/users/:id` | JWT **ADMIN** | Detalhe + favoritos + assistidos |
 | GET | `/admin/rankings/favorites` | JWT **ADMIN** | Ranking mais favoritados |
@@ -97,7 +99,7 @@ Validação de entrada com **Zod** (`nestjs-zod` + `ZodValidationPipe` global).
 1. **OMDb só no backend** — chave de API não exposta no browser; tratamento centralizado de timeout/erros HTTP e `Response: False` da OMDb.
 2. **Filme persistido após validação OMDb** — `imdbId` é confirmado com `i=` antes de criar favorito/assistido; `Movie` é *upsert* com dados atualizados.
 3. **Duplicidade** — regra na aplicação + índice único `(userId, movieId)` em `Favorite` e `Watched`.
-4. **Autorização** — `JwtStrategy` recarrega usuário no banco; `RolesGuard` + decorator `@Roles()` nas rotas admin.
+4. **Autorização** — `JwtStrategy` recarrega usuário no banco; `RolesGuard` + `@Roles()`: rotas **admin** só `ADMIN`; busca/favoritos/assistidos só `COMUM`, alinhado ao enunciado (papéis separados).
 5. **Arquitetura em estilo Transaction Script** — serviços por caso de uso (`AuthService`, `MoviesService`, `FavoritesService`, `WatchedService`, `AdminService`, `OmdbService`) com fluxos sequenciais explícitos.
 6. **Prisma 6** — mantida conexão direta a Postgres sem *driver adapter* exigido pelo Prisma 7, simplificando o teste local.
 

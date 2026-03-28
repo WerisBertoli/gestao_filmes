@@ -17,12 +17,21 @@ export class AuthService {
 
   private static readonly TOKEN_KEY = 'access_token';
 
+  /** Rota inicial após autenticação, conforme perfil (enunciado do teste). */
+  postLoginPath(): string {
+    return this.isAdmin() ? '/app/admin/rankings' : '/app/busca';
+  }
+
   login(body: {
     email: string;
     password: string;
   }): Observable<{ accessToken: string }> {
+    const payload = {
+      email: body.email.trim().toLowerCase(),
+      password: body.password,
+    };
     return this.http
-      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/login`, body)
+      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/login`, payload)
       .pipe(
         tap((res) =>
           localStorage.setItem(AuthService.TOKEN_KEY, res.accessToken),
@@ -34,8 +43,15 @@ export class AuthService {
     email: string;
     password: string;
   }): Observable<{ accessToken: string }> {
+    const payload = {
+      email: body.email.trim().toLowerCase(),
+      password: body.password,
+    };
     return this.http
-      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/register`, body)
+      .post<{ accessToken: string }>(
+        `${environment.apiUrl}/auth/register`,
+        payload,
+      )
       .pipe(
         tap((res) =>
           localStorage.setItem(AuthService.TOKEN_KEY, res.accessToken),

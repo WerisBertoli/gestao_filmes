@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DxButtonModule } from 'devextreme-angular/ui/button';
@@ -34,7 +34,12 @@ import { AuthService } from '../../core/auth.service';
             </div>
             <div class="field">
               <label>Senha</label>
-              <dx-text-box [(value)]="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" mode="password" stylingMode="outlined" [inputAttr]="{autocomplete:'current-password'}" />
+              <div class="pass-wrap">
+                <dx-text-box [(value)]="password" placeholder="Sua senha" [mode]="showPass() ? 'text' : 'password'" stylingMode="outlined" [inputAttr]="{autocomplete:'current-password'}" />
+                <button type="button" class="pass-toggle" (click)="showPass.set(!showPass())" [title]="showPass() ? 'Ocultar senha' : 'Ver senha'">
+                  {{ showPass() ? '&#128065;&#65039;' : '&#128065;' }}
+                </button>
+              </div>
             </div>
           </div>
           @if (error) { <div class="alert-error">{{ error }}</div> }
@@ -73,6 +78,10 @@ import { AuthService } from '../../core/auth.service';
     .demo-box { border: 1px dashed #DDE3F0; border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.78rem; color: #6B7A99; cursor: pointer; }
     .demo-box summary { font-weight: 500; }
     .demo-box p { margin: 0.35rem 0 0; font-family: monospace; color: #1D398C; }
+    .pass-wrap { position: relative; }
+    .pass-wrap dx-text-box { display: block; }
+    .pass-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: #6B7A99; padding: 0.25rem; line-height: 1; z-index: 1; }
+    .pass-toggle:hover { color: #1D398C; }
     @media (max-width: 720px) { .auth-left { display: none; } .auth-right { flex: 1; } }
   `],
 })
@@ -80,6 +89,7 @@ export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   email = ''; password = ''; loading = false; error = '';
+  readonly showPass = signal(false);
   submit(): void {
     this.error = ''; this.loading = true;
     this.auth.login({ email: this.email, password: this.password }).subscribe({
