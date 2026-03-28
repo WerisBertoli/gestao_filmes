@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gestao_filmes_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gestao
+      POSTGRES_PASSWORD: gestao
+      POSTGRES_DB: gestao_filmes
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

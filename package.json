@@ -1,0 +1,24 @@
+{
+  "name": "gestao_filmes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo — Teste técnico Microkids (gestão de filmes OMDb)",
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"pnpm --filter api start:dev\" \"pnpm --filter web start --host 0.0.0.0 --port 4200\"",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:web": "pnpm --filter web start --host 0.0.0.0 --port 4200",
+    "build": "pnpm --filter api build && pnpm --filter web build",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter api exec prisma migrate deploy",
+    "db:seed": "pnpm --filter api prisma:seed",
+    "lint": "pnpm --filter api lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
