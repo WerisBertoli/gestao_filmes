@@ -1,0 +1,8 @@
+{
+  "angular.projects": [
+    {
+      "root": "apps/web",
+      "tsConfig": "apps/web/tsconfig.app.json"
+    }
+  ]
+}

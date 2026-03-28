@@ -13,14 +13,14 @@ import { MovieApiService, UserListItem } from '../../core/movie-api.service';
       <div class="page-header">
         <div>
           <h2>Usuários</h2>
-          <p class="subtitle">Gerencie e visualize todos os usuários cadastrados</p>
+          <p class="subtitle">Todos os usuários cadastrados na plataforma</p>
         </div>
         @if (!loading) { <span class="count-badge">{{ users.length }} usuário(s)</span> }
       </div>
       @if (loading) {
-        <div class="loading-wrap"><dx-load-indicator [visible]="true" /><span>Carregando usuários...</span></div>
+        <div class="loading-wrap"><dx-load-indicator [visible]="true" /><span>Carregando...</span></div>
       } @else {
-        <div class="card">
+        <div class="card table-card">
           <table class="table">
             <thead>
               <tr>
@@ -33,21 +33,21 @@ import { MovieApiService, UserListItem } from '../../core/movie-api.service';
             <tbody>
               @for (u of users; track u.id) {
                 <tr>
-                  <td class="email-cell">
-                    <div class="avatar">{{ u.email[0].toUpperCase() }}</div>
-                    {{ u.email }}
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar">{{ u.email[0].toUpperCase() }}</div>
+                      <span>{{ u.email }}</span>
+                    </div>
                   </td>
                   <td>
                     @if (u.role === 'ADMIN') {
-                      <span class="chip chip-admin">Admin</span>
+                      <span class="badge badge-admin">Admin</span>
                     } @else {
-                      <span class="chip chip-comum">Comum</span>
+                      <span class="badge badge-comum">Comum</span>
                     }
                   </td>
-                  <td class="date-cell">{{ u.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-                  <td class="action-cell">
-                    <button class="btn-detail" (click)="open(u)">Ver detalhes</button>
-                  </td>
+                  <td class="muted">{{ u.createdAt | date: 'dd/MM/yyyy' }}</td>
+                  <td><button class="btn-detail" (click)="open(u)">Detalhes &#8594;</button></td>
                 </tr>
               }
             </tbody>
@@ -59,28 +59,28 @@ import { MovieApiService, UserListItem } from '../../core/movie-api.service';
   `,
   styles: [`
     .page { padding: 1.75rem 2rem; max-width: 1100px; margin: 0 auto; }
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-    h2 { font-size: 1.4rem; font-weight: 700; margin: 0 0 0.25rem; color: #1a202c; letter-spacing: -0.02em; }
-    .subtitle { font-size: 0.875rem; color: #718096; margin: 0; }
-    .count-badge { background: #faf5ff; color: #6b46c1; font-size: 0.8rem; font-weight: 600; padding: 0.3rem 0.85rem; border-radius: 20px; align-self: center; }
-    .card { background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
-    .loading-wrap { display: flex; align-items: center; gap: 0.75rem; padding: 2rem; color: #718096; font-size: 0.875rem; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem; }
+    h2 { font-size: 1.35rem; font-weight: 800; margin: 0 0 0.2rem; color: #0F1A35; letter-spacing: -0.025em; }
+    .subtitle { font-size: 0.875rem; color: #6B7A99; margin: 0; }
+    .count-badge { background: #EAEFFF; color: #1D398C; font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.9rem; border-radius: 20px; align-self: center; }
+    .loading-wrap { display: flex; align-items: center; gap: 0.75rem; padding: 2rem; color: #6B7A99; font-size: 0.875rem; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(29,57,140,0.08); }
+    .table-card { overflow: hidden; border: 1px solid #EEF2FF; }
     .table { width: 100%; border-collapse: collapse; }
-    .table thead tr { border-bottom: 2px solid #f0f4f8; }
-    .table th { padding: 0.85rem 1.25rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.05em; background: #fafbfc; }
-    .table td { padding: 0.9rem 1.25rem; font-size: 0.875rem; color: #1a202c; border-bottom: 1px solid #f0f4f8; }
-    .table tbody tr:hover { background: #fafbff; }
+    .table thead { border-bottom: 2px solid #EEF2FF; }
+    .table th { padding: 0.85rem 1.25rem; text-align: left; font-size: 0.7rem; font-weight: 700; color: #98A2BE; text-transform: uppercase; letter-spacing: 0.06em; background: #FAFBFF; }
+    .table td { padding: 0.9rem 1.25rem; font-size: 0.875rem; color: #0F1A35; border-bottom: 1px solid #F3F5FC; }
     .table tbody tr:last-child td { border-bottom: none; }
-    .email-cell { display: flex; align-items: center; gap: 0.75rem; }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
-    .chip { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-    .chip-admin { background: #ebf4ff; color: #2b6cb0; }
-    .chip-comum { background: #f0fff4; color: #276749; }
-    .date-cell { color: #718096; font-size: 0.825rem; }
-    .action-cell { text-align: right; }
-    .btn-detail { background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.35rem 0.85rem; font-size: 0.8rem; font-weight: 500; color: #3b82f6; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-    .btn-detail:hover { background: #ebf4ff; border-color: #3b82f6; }
-    .msg-error { color: #e53e3e; font-size: 0.875rem; }
+    .table tbody tr:hover td { background: #F7F9FF; }
+    .user-cell { display: flex; align-items: center; gap: 0.75rem; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #1D398C, #65ECEC); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; flex-shrink: 0; }
+    .badge { display: inline-block; padding: 0.2rem 0.65rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .badge-admin { background: #EAEFFF; color: #1D398C; }
+    .badge-comum { background: rgba(210,224,3,0.15); color: #5A6B00; }
+    .muted { color: #6B7A99; font-size: 0.825rem; }
+    .btn-detail { background: none; border: 1px solid #DDE3F0; border-radius: 8px; padding: 0.35rem 0.85rem; font-size: 0.8rem; font-weight: 600; color: #1D398C; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+    .btn-detail:hover { background: #EAEFFF; border-color: #1D398C; }
+    .msg-error { color: #D63939; font-size: 0.875rem; margin-top: 0.5rem; }
   `],
 })
 export class AdminUsersComponent implements OnInit {
@@ -89,7 +89,7 @@ export class AdminUsersComponent implements OnInit {
   users: UserListItem[] = []; loading = true; error = '';
   ngOnInit(): void {
     this.api.listUsers().subscribe({
-      next: (data) => { this.users = data; this.loading = false; },
+      next: (d) => { this.users = d; this.loading = false; },
       error: () => { this.error = 'Não foi possível listar usuários.'; this.loading = false; },
     });
   }
