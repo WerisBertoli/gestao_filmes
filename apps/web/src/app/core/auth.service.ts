@@ -72,10 +72,38 @@ export class AuthService {
     if (!t) {
       return null;
     }
+    const parts = t.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+    const json = AuthService.decodeBase64Url(parts[1]);
+    if (!json) {
+      return null;
+    }
     try {
-      const payload = t.split('.')[1];
-      const json = atob(payload);
-      return JSON.parse(json) as JwtPayload;
+      const raw = JSON.parse(json) as Record<string, unknown>;
+      const sub = raw['sub'];
+      const email = raw['email'];
+      const roleRaw = String(raw['role'] ?? '').toUpperCase();
+      if (typeof sub !== 'string' || typeof email !== 'string') {
+        return null;
+      }
+      if (roleRaw !== 'ADMIN' && roleRaw !== 'COMUM') {
+        return null;
+      }
+      return { sub, email, role: roleRaw as JwtPayload['role'] };
+    } catch {
+      return null;
+    }
+  }
+
+  /** JWT usa base64url; `atob` exige base64 padrão com padding. */
+  private static decodeBase64Url(segment: string): string | null {
+    try {
+      const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+      const padLen = (4 - (base64.length % 4)) % 4;
+      const padded = base64 + '='.repeat(padLen);
+      return atob(padded);
     } catch {
       return null;
     }

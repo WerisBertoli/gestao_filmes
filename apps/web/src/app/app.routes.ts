@@ -21,57 +21,74 @@ export const routes: Routes = [
   {
     path: 'app',
     loadComponent: () =>
-      import('./pages/shell/shell.component').then((m) => m.ShellComponent),
+      import('./pages/app-layout-root/app-layout-root.component').then(
+        (m) => m.AppLayoutRootComponent,
+      ),
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', component: AppHomeRedirectComponent },
       {
-        path: 'busca',
-        canActivate: [comumGuard],
+        path: 'admin',
         loadComponent: () =>
-          import('./pages/search/search.component').then(
-            (m) => m.SearchComponent,
+          import('./pages/shell-admin/shell-admin.component').then(
+            (m) => m.ShellAdminComponent,
           ),
-      },
-      {
-        path: 'favoritos',
-        canActivate: [comumGuard],
-        loadComponent: () =>
-          import('./pages/favorites/favorites.component').then(
-            (m) => m.FavoritesComponent,
-          ),
-      },
-      {
-        path: 'assistidos',
-        canActivate: [comumGuard],
-        loadComponent: () =>
-          import('./pages/watched/watched.component').then(
-            (m) => m.WatchedComponent,
-          ),
-      },
-      {
-        path: 'admin/rankings',
         canActivate: [adminGuard],
-        loadComponent: () =>
-          import('./pages/admin-rankings/admin-rankings.component').then(
-            (m) => m.AdminRankingsComponent,
-          ),
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'rankings' },
+          {
+            path: 'rankings',
+            loadComponent: () =>
+              import('./pages/admin-rankings/admin-rankings.component').then(
+                (m) => m.AdminRankingsComponent,
+              ),
+          },
+          {
+            path: 'usuarios',
+            loadComponent: () =>
+              import('./pages/admin-users/admin-users.component').then(
+                (m) => m.AdminUsersComponent,
+              ),
+          },
+          {
+            path: 'usuarios/:id',
+            loadComponent: () =>
+              import(
+                './pages/admin-user-detail/admin-user-detail.component'
+              ).then((m) => m.AdminUserDetailComponent),
+          },
+        ],
       },
       {
-        path: 'admin/usuarios',
-        canActivate: [adminGuard],
+        path: '',
         loadComponent: () =>
-          import('./pages/admin-users/admin-users.component').then(
-            (m) => m.AdminUsersComponent,
+          import('./pages/shell-comum/shell-comum.component').then(
+            (m) => m.ShellComumComponent,
           ),
-      },
-      {
-        path: 'admin/usuarios/:id',
-        canActivate: [adminGuard],
-        loadComponent: () =>
-          import('./pages/admin-user-detail/admin-user-detail.component').then(
-            (m) => m.AdminUserDetailComponent,
-          ),
+        canActivate: [comumGuard],
+        children: [
+          {
+            path: 'busca',
+            loadComponent: () =>
+              import('./pages/search/search.component').then(
+                (m) => m.SearchComponent,
+              ),
+          },
+          {
+            path: 'favoritos',
+            loadComponent: () =>
+              import('./pages/favorites/favorites.component').then(
+                (m) => m.FavoritesComponent,
+              ),
+          },
+          {
+            path: 'assistidos',
+            loadComponent: () =>
+              import('./pages/watched/watched.component').then(
+                (m) => m.WatchedComponent,
+              ),
+          },
+        ],
       },
     ],
   },
