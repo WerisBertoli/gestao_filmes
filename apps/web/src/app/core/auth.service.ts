@@ -21,8 +21,12 @@ export class AuthService {
     email: string;
     password: string;
   }): Observable<{ accessToken: string }> {
+    const payload = {
+      email: body.email.trim().toLowerCase(),
+      password: body.password,
+    };
     return this.http
-      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/login`, body)
+      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/login`, payload)
       .pipe(
         tap((res) =>
           localStorage.setItem(AuthService.TOKEN_KEY, res.accessToken),
@@ -34,8 +38,15 @@ export class AuthService {
     email: string;
     password: string;
   }): Observable<{ accessToken: string }> {
+    const payload = {
+      email: body.email.trim().toLowerCase(),
+      password: body.password,
+    };
     return this.http
-      .post<{ accessToken: string }>(`${environment.apiUrl}/auth/register`, body)
+      .post<{ accessToken: string }>(
+        `${environment.apiUrl}/auth/register`,
+        payload,
+      )
       .pipe(
         tap((res) =>
           localStorage.setItem(AuthService.TOKEN_KEY, res.accessToken),
