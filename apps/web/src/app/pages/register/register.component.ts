@@ -86,7 +86,7 @@ export class RegisterComponent {
   submit(): void {
     this.error = ''; this.loading = true;
     this.auth.register({ email: this.email, password: this.password }).subscribe({
-      next: () => void this.router.navigate(['/app/busca']),
+      next: () => void this.router.navigateByUrl(this.auth.postLoginPath()),
       error: (err: { error?: { message?: string | string[] } }) => {
         this.loading = false;
         const m = err?.error?.message;

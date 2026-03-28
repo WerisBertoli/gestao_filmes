@@ -1,8 +1,8 @@
-import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { adminGuard } from './core/admin.guard';
 import { authGuard } from './core/auth.guard';
-import { AuthService } from './core/auth.service';
+import { comumGuard } from './core/comum.guard';
+import { AppHomeRedirectComponent } from './pages/app-home-redirect/app-home-redirect.component';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
@@ -24,9 +24,10 @@ export const routes: Routes = [
       import('./pages/shell/shell.component').then((m) => m.ShellComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: () => inject(AuthService).isAdmin() ? 'admin/rankings' : 'busca' },
+      { path: '', pathMatch: 'full', component: AppHomeRedirectComponent },
       {
         path: 'busca',
+        canActivate: [comumGuard],
         loadComponent: () =>
           import('./pages/search/search.component').then(
             (m) => m.SearchComponent,
@@ -34,6 +35,7 @@ export const routes: Routes = [
       },
       {
         path: 'favoritos',
+        canActivate: [comumGuard],
         loadComponent: () =>
           import('./pages/favorites/favorites.component').then(
             (m) => m.FavoritesComponent,
@@ -41,6 +43,7 @@ export const routes: Routes = [
       },
       {
         path: 'assistidos',
+        canActivate: [comumGuard],
         loadComponent: () =>
           import('./pages/watched/watched.component').then(
             (m) => m.WatchedComponent,

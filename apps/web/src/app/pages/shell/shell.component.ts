@@ -9,7 +9,7 @@ import { AuthService } from '../../core/auth.service';
   template: `
     <header class="header">
       <div class="header-inner">
-        <a routerLink="/app/busca" class="brand">
+        <a [routerLink]="auth.isAdmin() ? '/app/admin/rankings' : '/app/busca'" class="brand">
           <div class="brand-logo">MK</div>
           <div class="brand-text">
             <span class="brand-name">Microkids</span>
@@ -17,14 +17,13 @@ import { AuthService } from '../../core/auth.service';
           </div>
         </a>
         <nav class="nav">
-          @if (!auth.isAdmin()) {
-            <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
-            <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
-            <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
-          }
           @if (auth.isAdmin()) {
             <a routerLink="/app/admin/rankings" routerLinkActive="active">Rankings</a>
             <a routerLink="/app/admin/usuarios" routerLinkActive="active">Usuários</a>
+          } @else {
+            <a routerLink="/app/busca" routerLinkActive="active">Buscar</a>
+            <a routerLink="/app/favoritos" routerLinkActive="active">Favoritos</a>
+            <a routerLink="/app/assistidos" routerLinkActive="active">Assistidos</a>
           }
         </nav>
         <div class="spacer"></div>

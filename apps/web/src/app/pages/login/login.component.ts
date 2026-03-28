@@ -46,8 +46,17 @@ import { AuthService } from '../../core/auth.service';
           <dx-button text="Entrar" type="default" stylingMode="contained" width="100%" [disabled]="loading" (onClick)="submit()" />
           <p class="switch-link">Não tem conta? <a routerLink="/register">Cadastre-se</a></p>
           <details class="demo-box">
-            <summary>Credenciais de demonstração</summary>
-            <p>admin&#64;microkids.test &nbsp;/&nbsp; admin123</p>
+            <summary>Conta administrador (demonstração)</summary>
+            <p class="demo-note">
+              Crie o usuário com <code>pnpm db:seed</code> na raiz (após
+              <code>pnpm db:migrate</code>).
+            </p>
+            <dl class="demo-creds">
+              <dt>E-mail</dt>
+              <dd>{{ demoAdminEmail }}</dd>
+              <dt>Senha</dt>
+              <dd>{{ demoAdminPassword }}</dd>
+            </dl>
           </details>
         </div>
       </div>
@@ -77,7 +86,11 @@ import { AuthService } from '../../core/auth.service';
     .switch-link a { color: #1D398C; font-weight: 600; }
     .demo-box { border: 1px dashed #DDE3F0; border-radius: 8px; padding: 0.5rem 0.85rem; font-size: 0.78rem; color: #6B7A99; cursor: pointer; }
     .demo-box summary { font-weight: 500; }
-    .demo-box p { margin: 0.35rem 0 0; font-family: monospace; color: #1D398C; }
+    .demo-note { margin: 0.35rem 0 0.5rem; font-size: 0.72rem; line-height: 1.4; color: #6B7A99; }
+    .demo-note code { font-size: 0.7rem; background: #F0F3FA; padding: 0.1rem 0.25rem; border-radius: 4px; }
+    .demo-creds { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; font-size: 0.78rem; align-items: baseline; }
+    .demo-creds dt { font-weight: 600; color: #3A4A6B; margin: 0; }
+    .demo-creds dd { margin: 0; font-family: ui-monospace, monospace; color: #1D398C; }
     .pass-wrap { position: relative; }
     .pass-wrap dx-text-box { display: block; }
     .pass-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: #6B7A99; padding: 0.25rem; line-height: 1; z-index: 1; }
@@ -88,18 +101,28 @@ import { AuthService } from '../../core/auth.service';
 export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  email = ''; password = ''; loading = false; error = '';
+  /** Igual a `apps/api/prisma/seed.ts` */
+  readonly demoAdminEmail = 'admin@microkids.test';
+  readonly demoAdminPassword = 'admin123';
+  email = '';
+  password = '';
+  loading = false;
+  error = '';
   readonly showPass = signal(false);
+
   submit(): void {
-    this.error = ''; this.loading = true;
+    this.error = '';
+    this.loading = true;
     this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => void this.router.navigate(['/app/busca']),
+      next: () => void this.router.navigateByUrl(this.auth.postLoginPath()),
       error: (err: { error?: { message?: string | string[] } }) => {
         this.loading = false;
         const m = err?.error?.message;
-        this.error = Array.isArray(m) ? m.join(', ') : m ?? 'Falha no login';
+        this.error = Array.isArray(m) ? m.join(', ') : (m ?? 'Falha no login');
       },
-      complete: () => { this.loading = false; },
+      complete: () => {
+        this.loading = false;
+      },
     });
   }
 }
